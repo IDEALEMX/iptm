@@ -1,5 +1,6 @@
 use std::env;
 use std::io::{self, Write};
+use chrono::Datelike;
 
 use regex::Regex;
 
@@ -24,8 +25,8 @@ struct Date {
     year: u16,
 }
 
-fn get_date(input: &str) {
-    let date_regex = Regex::new(r"(?x)
+fn parse_date(input: &str) {
+    let date_regex = Regex::new(r"(?x) # allows comments
         (\d{1,2}|\.|\+\d{1,2})[\-\/] # day
         (\d{1,2}|\.|\+\d{1,2})[\-\/] # month
         (\d{2,4}|\.|\+\d{1,2}) #year")
@@ -37,11 +38,25 @@ fn get_date(input: &str) {
     }
 }
 
+fn parse_date_element(element_string: &str, current: i32) -> i32 {
+    let first_char: char = element_string.chars().next().unwrap();
+    let char_rest: &str = &element_string.to_string()[1..];
+    if first_char == '.' {
+        return current
+    }
+
+    if (first_char == '+') {
+        return first_char + char_rest.
+    }
+
+    return current
+}
+
 fn get_input(message: &str) -> String {
     print!("{message}");
     io::stdout().flush().unwrap();
     let mut user_input = String::new();
     io::stdin().read_line(&mut user_input).expect("Error, failed to read user input");
-    user_input.trim_end().to_string()
+    return user_input.trim_end().to_string()
 }
 
