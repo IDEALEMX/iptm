@@ -1,6 +1,8 @@
 pub mod date;
 
-use crate::date::Date;
+use crate::date::NaiveDateExt; 
+
+use chrono::NaiveDate;
 use std::env;
 use std::io::{self, Write};
 
@@ -13,7 +15,7 @@ fn main() {
             "hello" => println!("Hello world!"),
             "date" => {
                 let input: String = get_input("enter date: ");
-                println!("{}", Date::from_str(input.as_str()).unwrap());
+                println!("{}", NaiveDate::from_str(input.as_str()).unwrap());
             },
             _ => eprintln!("Error, unrecognized arguments"),
         }
