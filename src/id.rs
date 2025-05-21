@@ -1,8 +1,10 @@
 use crate::calendar::Calendar;
 
 use rand::Rng;
+use serde::{Serialize, Deserialize};
 
 #[derive(PartialEq, Eq)]
+#[derive(Serialize, Deserialize)]
 pub struct Id(u32);
 
 impl Id {
@@ -10,7 +12,7 @@ impl Id {
      * Will generate a new and unique Id for a given task based on the ones already present at the
      * current calendar
      */
-    pub fn new(calendar: Calendar) -> Id{
+    pub fn new(calendar: &Calendar) -> Id{
         let mut id: u32;
         loop {
             id = rand::rng().random();
@@ -18,5 +20,10 @@ impl Id {
             else {break};
         }
         Id(id)
+    }
+
+    pub fn get(&self) -> &u32 {
+        let Id(id) = self;
+        id
     }
 }

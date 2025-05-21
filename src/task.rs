@@ -3,7 +3,9 @@ use crate::id::Id;
 
 use std::path::{Path, PathBuf};
 use chrono::NaiveDate;
+use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Task {
     pub id: Id,
     pub name: String,
@@ -16,7 +18,7 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn from(calendar: Calendar, name: &str, due_date: NaiveDate, difficulty: Option<u8>, is_subtask: bool) -> Option<Task> {
+    pub fn new(calendar: &Calendar, name: &str, due_date: NaiveDate, difficulty: Option<u8>, is_subtask: bool) -> Option<Task> {
 
         if let Some(diff) = difficulty {    
             if diff > 10 || diff == 0 { 
@@ -26,7 +28,7 @@ impl Task {
         }
 
         let id: Id = Id::new(calendar);
-        let path: String = format!("{}/.local/share/iptm/details_files/", std::env::var("HOME").unwrap());
+        let path: String = format!("{}/.local/share/iptm/details_files/{}.md", std::env::var("HOME").unwrap(), id.get());
         let details_file: Box<Path> = PathBuf::from(path).into_boxed_path();
     
         let new_task: Task = Task {
