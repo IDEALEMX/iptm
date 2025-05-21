@@ -33,6 +33,15 @@ fn main() {
                     Err(err) => panic!("{err}"),
                 };
             },
+
+            "list" => {
+                let calendar: Calendar = Calendar::load().expect("Failed to open calendar file, check integrity");
+                calendar.print();
+                match calendar.save() {
+                    Ok(_) => (),
+                    Err(err) => panic!("{err}"),
+                };
+            }
             _ => eprintln!("Error, unrecognized arguments"),
         }
     } else {

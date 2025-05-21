@@ -41,6 +41,9 @@ impl Calendar {
 
     pub fn print(&self) {
         let Calendar(calendar_hash_map) = self;
+        if calendar_hash_map.is_empty() {
+            println!("you have no upcoming tasks!");
+        }
         for date in calendar_hash_map.values() {
             for task in date.iter() {
                 println!("{}- task: {}, due: {}", task.id.get(), task.name, task.due_date);
