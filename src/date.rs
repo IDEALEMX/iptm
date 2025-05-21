@@ -14,7 +14,7 @@ impl NaiveDateExt for NaiveDate{
         (\d{2,4}|\.|\+\d{1,2}) #year")
             .unwrap();
         if let Some(captured_date) = date_regex.captures(input) {
-            let current_date = chrono::Utc::now();
+            let current_date = chrono::Local::now();
             let day: i64 = parse_date_element(&captured_date[1], current_date.day() as i64);
             let month: u32 = parse_date_element(&captured_date[2], current_date.month() as u32);
             let year: i32 = parse_date_element(&captured_date[3], current_date.year() as i32);

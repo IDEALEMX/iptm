@@ -1,4 +1,7 @@
 pub mod date;
+pub mod task;
+pub mod id;
+pub mod calendar;
 
 use crate::date::NaiveDateExt; 
 
@@ -7,7 +10,6 @@ use std::env;
 use std::io::{self, Write};
 
 fn main() {
-    // handle program arguments
     let args: Vec<String> = env::args().collect();
 
     if let Some(first_arg) = args.get(1) {
