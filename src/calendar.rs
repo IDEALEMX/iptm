@@ -6,7 +6,7 @@ use std::fs::File;
 use std::io::{Write, BufReader};
 
 #[derive(Serialize, Deserialize)]
-pub struct Calendar (Vec<Task>);
+pub struct Calendar (pub Vec<Task>);
 
 impl Calendar {
     fn new() -> Calendar {
@@ -23,13 +23,25 @@ impl Calendar {
         let Calendar(calendar_vec) = self;
         if calendar_vec.is_empty() {
             println!("you have no upcoming tasks!");
+            return;
         }
         for task in calendar_vec {
-            println!("{} [{}]", task.name, task.due_date);
+            println!("{} [󰃰 : {}]", task.name, task.due_date);
             for subtask in task.subtasks.iter() {
-                println!("  * subtask: {}", subtask.name);
+                println!("  * subtask: {} [ : {}]", subtask.name, subtask.days_required.0);
             }
             println!();
+        };
+    }
+
+    pub fn print_tasks(&self) {
+        let Calendar(calendar_vec) = self;
+        if calendar_vec.is_empty() {
+            println!("you have no upcoming tasks!");
+            return;
+        }
+        for (i, task) in calendar_vec.iter().enumerate() {
+            println!("{}) {} [󰃰 : {}]", i, task.name, task.due_date);
         };
     }
 

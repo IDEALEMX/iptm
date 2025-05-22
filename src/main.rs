@@ -6,7 +6,7 @@ pub mod calendar;
 pub mod input;
 
 use calendar::Calendar;
-use input::get_task;
+use input::{get_task, get_subtask, get_number};
 use task::Task;
 
 use std::env;
@@ -39,6 +39,20 @@ fn handle_new(args: Vec<String>) {
             calendar.push(new_task);
             calendar.save().unwrap();
         },
+
+        Some("subtask") => {
+            let mut calendar: Calendar = Calendar::load().unwrap();
+            calendar.print_tasks();
+            let Calendar(vec) = &mut calendar;
+            if vec.is_empty() {
+                return;
+            }
+            let task_index: usize = get_number("Enter parent task index: ").unwrap();
+            let parent_task: &mut Task = vec.get_mut(task_index).expect("Error, invalid task index");
+            let subtask = get_subtask().unwrap();
+            parent_task.push(subtask);
+            calendar.save().unwrap();
+        }
 
         None => eprintln!("Error, missing arguments after new"),
 

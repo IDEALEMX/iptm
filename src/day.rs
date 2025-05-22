@@ -9,7 +9,7 @@ use regex::Regex;
 pub struct Day(pub i64);
 
 impl Day {
-    fn from_str(input: &str) -> Result<Day, String> {
+    pub fn from_str(input: &str) -> Result<Day, String> {
         let date_regex = Regex::new(r"(?x) # allows comments
         (\.|\+\d{1,2})[\-\/] # day
         (\.|\+\d{1,2})[\-\/] # month

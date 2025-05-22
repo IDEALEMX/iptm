@@ -37,7 +37,7 @@ impl NaiveDateExt for NaiveDate{
 
     fn days_from_today(&self) -> i64 {
         let today = Local::now().date_naive();
-        (today - *self).num_days()
+        (*self - today).num_days()
     }
 
 }
