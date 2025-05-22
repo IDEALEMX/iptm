@@ -25,30 +25,31 @@ impl Calendar {
             println!("you have no upcoming tasks!");
         }
         for task in calendar_vec {
-            println!("task: {}, due: {}", task.name, task.due_date);
+            println!("{} [{}]", task.name, task.due_date);
             for subtask in task.subtasks.iter() {
                 println!("  * subtask: {}", subtask.name);
             }
+            println!();
         };
     }
 
-    fn to_json(&self) -> Result<String, serde_json::Error> {
-        let calendar_ser: Result<String, serde_json::Error> = to_string_pretty(self);
-        calendar_ser
+    fn to_json(&self) -> Result<String, String> {
+        let calendar_ser = to_string_pretty(self).map_err(|_| "Error, failed to serialize data, all changes were lost")?;
+        Ok(calendar_ser)
     }
 
-    pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let mut file: File = File::create("test_cal.json")?;
+    pub fn save(&self) -> Result<(), String> {
+        let mut file: File = File::create("test_cal.json").map_err(|_| "Error, failed to create json file, all changes were lost")?;
         let json: String = self.to_json()?;
-        writeln!(file, "{json}")?;
+        writeln!(file, "{json}").map_err(|_| "Error, failed to write to json file, all changes were lost")?;
         Ok(())
     }
 
-    pub fn load() -> Result<Calendar, Box<dyn std::error::Error>> {
+    pub fn load() -> Result<Calendar, String> {
         match File::open("test_cal.json") {
             Ok(file) => {
                 let reader = BufReader::new(file);
-                let new_calendar = from_reader(reader)?;
+                let new_calendar = from_reader(reader).map_err(|_| "Error, failed to load calendar")?;
                 Ok(new_calendar)
             },
             Err(_) => Ok(Calendar::new())

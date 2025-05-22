@@ -16,9 +16,9 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn new(name: &str, due_date: NaiveDate) -> Option<Task> {
+    pub fn new(name: &str, due_date: NaiveDate) -> Result<Task, String> {
         let id: Uuid = Uuid::new_v4();
-        let path: String = format!("{}/.local/share/iptm/details_files/{}.md", std::env::var("HOME").unwrap(), id);
+        let path: String = format!("{}/.local/share/iptm/details_files/{}.md", std::env::var("HOME").map_err(|_| "Error, failed to access user home")?, id);
         let details_file: Box<Path> = PathBuf::from(path).into_boxed_path();
     
         let new_task: Task = Task {
@@ -30,7 +30,7 @@ impl Task {
             subtasks: Vec::new(),
         };
 
-        Some(new_task)
+        Ok(new_task)
     }
 
     pub fn push(&mut self, subtask: Subtask) {
