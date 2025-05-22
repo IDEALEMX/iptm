@@ -25,4 +25,9 @@ impl Day {
 
         Ok(Day(day_difference))
     }
+
+    pub fn from_date(input: NaiveDate) -> Day {
+        let day_difference: i64 = input.days_from_today();
+        Day(day_difference)
+    }
 }

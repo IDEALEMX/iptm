@@ -1,4 +1,5 @@
 use crate::task::Task;
+use crate::day::Day;
 
 use serde::{Serialize, Deserialize};
 use serde_json::{to_string_pretty, from_reader};
@@ -26,7 +27,7 @@ impl Calendar {
             return;
         }
         for task in calendar_vec {
-            println!("{} [󰃰 : {}]", task.name, task.due_date);
+            println!("{}: [ : {}] [󰃰 : {}]", task.name, Day::from_date(task.due_date).0, task.due_date);
             for subtask in task.subtasks.iter() {
                 println!("  * subtask: {} [ : {}]", subtask.name, subtask.days_required.0);
             }
