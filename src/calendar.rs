@@ -1,53 +1,34 @@
 use crate::task::Task;
-use crate::id::Id;
 
-use chrono::NaiveDate;
 use serde::{Serialize, Deserialize};
 use serde_json::{to_string_pretty, from_reader};
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Write, BufReader};
 
 #[derive(Serialize, Deserialize)]
-pub struct Calendar (HashMap<NaiveDate, Vec<Task>>);
+pub struct Calendar (Vec<Task>);
 
 impl Calendar {
-    pub fn get_task_by_id(&self, search_id: Id) -> Option<&Task> {
-        let Calendar(calendar_hash_map) = self;
-        for date in calendar_hash_map.values() {
-            for task in date.iter() {
-                if task.id == search_id {
-                    return Some(task);
-                };
-            };
-        };
-        return None;
-    }
-
     fn new() -> Calendar {
-        let calendar: HashMap<NaiveDate, Vec<Task>> = HashMap::new();
+        let calendar:Vec<Task> = Vec::new();
         Calendar(calendar)
     }
 
-    pub fn add(&mut self, new_task: Task) {
-        let date = new_task.due_date;
-        let Calendar(calendar_hash_map) = self;
-        let date_option: Option<&mut Vec<Task>> = calendar_hash_map.get_mut(&date);
-        match date_option {
-            Some(task_vec) => task_vec.push(new_task),
-            None => {calendar_hash_map.insert(date, vec![new_task]);},
-        }
+    pub fn push(&mut self, new_task: Task) {
+        let Calendar(calendar_vec) = self;
+        calendar_vec.push(new_task);
     }
 
     pub fn print(&self) {
-        let Calendar(calendar_hash_map) = self;
-        if calendar_hash_map.is_empty() {
+        let Calendar(calendar_vec) = self;
+        if calendar_vec.is_empty() {
             println!("you have no upcoming tasks!");
         }
-        for date in calendar_hash_map.values() {
-            for task in date.iter() {
-                println!("{}- task: {}, due: {}", task.id.get(), task.name, task.due_date);
-            };
+        for task in calendar_vec {
+            println!("task: {}, due: {}", task.name, task.due_date);
+            for subtask in task.subtasks.iter() {
+                println!("  * subtask: {}", subtask.name);
+            }
         };
     }
 

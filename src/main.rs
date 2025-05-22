@@ -1,13 +1,16 @@
 pub mod date;
 pub mod task;
-pub mod id;
+pub mod subtask;
+pub mod day;
 pub mod calendar;
 
 use crate::date::NaiveDateExt; 
 
 use calendar::Calendar;
 use chrono::NaiveDate;
+use subtask::Subtask;
 use task::Task;
+use day::Day;
 use std::env;
 use std::io::{self, Write};
 
@@ -25,8 +28,12 @@ fn main() {
                 let mut calendar: Calendar = Calendar::load().expect("Failed to open calendar file, check integrity");
                 let due_date: NaiveDate = NaiveDate::from_str("+1/./.").unwrap();
                 let name: &str = "test task";
-                let new_task: Task = Task::new(&calendar, name, due_date, None, false).unwrap();
-                calendar.add(new_task);
+                let mut new_task: Task = Task::new(name, due_date).unwrap();
+
+                let new_subtask: Subtask = Subtask::new("test_subtask", Day(5)).unwrap();
+                new_task.push(new_subtask);
+
+                calendar.push(new_task);
                 calendar.print();
                 match calendar.save() {
                     Ok(_) => (),

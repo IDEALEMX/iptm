@@ -1,9 +1,12 @@
-
 use regex::Regex;
-use chrono::{NaiveDate, Duration, Datelike};
+use chrono::{NaiveDate, Duration, Datelike, Local};
+
+use std::str::FromStr;
+use std::ops::Add;
 
 pub trait NaiveDateExt {
     fn from_str(input: &str) -> Option<NaiveDate>;
+    fn days_from_today(&self) -> i64;
 }
 
 impl NaiveDateExt for NaiveDate{
@@ -36,9 +39,15 @@ impl NaiveDateExt for NaiveDate{
             return None;
         }
     }
+
+    fn days_from_today(&self) -> i64 {
+        let today = Local::now().date_naive();
+        (today - *self).num_days()
+    }
+
 }
 
-fn normalize_date(year: i32, mut month: u32, day: i64) -> Option<NaiveDate> {
+pub fn normalize_date(year: i32, mut month: u32, day: i64) -> Option<NaiveDate> {
     // Start from the first of the month
     month = month.max(1).min(12); // clamp month to 1–12
     let base = NaiveDate::from_ymd_opt(year, month, 1)?;
@@ -47,10 +56,7 @@ fn normalize_date(year: i32, mut month: u32, day: i64) -> Option<NaiveDate> {
     Some(normalized)
 }
 
-use std::str::FromStr;
-use std::ops::Add;
-
-fn parse_date_element<T>(element_string: &str, current: T) -> T 
+pub fn parse_date_element<T>(element_string: &str, current: T) -> T 
 where
     T: Add<Output = T> + FromStr, <T as FromStr>::Err: std::fmt::Debug,
 {
