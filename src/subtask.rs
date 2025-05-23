@@ -9,7 +9,8 @@ pub struct Subtask {
     pub id: Uuid,
     pub name: String,
     pub details_file: Box<Path>,
-    pub days_required: Day
+    pub days_required: Day,
+    pub finished: bool,
 }
 
 impl Subtask {
@@ -23,6 +24,7 @@ impl Subtask {
             name: name.to_string(),
             details_file,
             days_required,
+            finished: false,
         };
 
         Ok(new_task)

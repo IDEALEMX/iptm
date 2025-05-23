@@ -6,6 +6,7 @@ pub mod calendar;
 pub mod input;
 
 use calendar::Calendar;
+use input::get_task_mut;
 use input::{create_task, create_subtask, get_number, get_task, get_subtask};
 use task::Task;
 use std::process::Command;
@@ -41,6 +42,13 @@ fn main() {
             match calendar.save() {
                 Ok(_) => (),
                 Err(e) => eprintln!("{e}"),
+            }
+        }
+
+        Some("finish") => {
+            match handle_finish(args) {
+                Err(e) => eprintln!("{e}"),
+                _ => (),
             }
         }
 
@@ -132,3 +140,19 @@ fn handle_read(args: Vec<String>) -> Result<(), String>{
     }
 }
 
+fn handle_finish(args: Vec<String>) -> Result<(), String> {
+    match args.get(2).map(String::as_str) {
+        Some("task") => {
+            let mut calendar: Calendar = Calendar::load()?;
+            calendar.print_tasks();
+            let task: &mut Task = get_task_mut(&mut calendar, "Enter task index: ")?.ok_or("You have no upcoming tasks!")?;
+            task.finished = true;
+            calendar.save()?;
+            Ok(())
+        }
+
+        None => Err("Error, missing arguments after new".to_string()),
+
+        _ => Err("Error, unrecognized arguments after new".to_string()),
+    }
+}

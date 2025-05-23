@@ -13,6 +13,7 @@ pub struct Task {
     pub details_file: Box<Path>,
     pub related_files: Vec<Box<Path>>,
     pub subtasks: Vec<Subtask>,
+    pub finished: bool,
 }
 
 impl Task {
@@ -28,6 +29,7 @@ impl Task {
             details_file,
             related_files: Vec::new(),
             subtasks: Vec::new(),
+            finished: false,
         };
 
         Ok(new_task)

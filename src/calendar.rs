@@ -1,4 +1,5 @@
 use crate::task::Task;
+use crate::subtask::Subtask;
 use crate::day::Day;
 
 use serde::{Serialize, Deserialize};
@@ -28,9 +29,9 @@ impl Calendar {
             return;
         }
         for task in calendar_vec {
-            println!("{}: [ : {}] [󰃰 : {}]", task.name, Day::from_date(task.due_date).0, task.due_date);
+            println!("{}{}: [ : {}] [󰃰 : {}]", task_is_finished_display(&task), task.name, Day::from_date(task.due_date).0, task.due_date);
             for subtask in task.subtasks.iter() {
-                println!("  * subtask: {} [ : {}]", subtask.name, subtask.days_required.0);
+                println!("      {}{}: [ : {}]", subtask_is_finished_display(subtask), subtask.name, subtask.days_required.0);
             }
             println!();
         };
@@ -68,5 +69,22 @@ impl Calendar {
             },
             Err(_) => Ok(Calendar::new())
         }
+    }
+}
+
+
+fn task_is_finished_display(task: &Task) -> &str {
+    if task.finished {
+        " "
+    } else {
+        " "
+    }
+}
+
+fn subtask_is_finished_display(subtask: &Subtask) -> &str {
+    if subtask.finished {
+        " "
+    } else {
+        " "
     }
 }
