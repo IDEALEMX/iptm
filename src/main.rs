@@ -6,7 +6,7 @@ pub mod calendar;
 pub mod input;
 
 use calendar::Calendar;
-use input::{create_task, create_subtask, get_number, get_task};
+use input::{create_task, create_subtask, get_number, get_task, get_subtask};
 use task::Task;
 use std::process::Command;
 use std::fs;
@@ -99,18 +99,30 @@ fn handle_read(args: Vec<String>) -> Result<(), String>{
             let task: &Task = get_task(&calendar, "Enter task index: ")?.ok_or("You have no upcoming tasks!")?;
 
             let dir = format!("{}/.local/share/iptm/details_files/", std::env::var("HOME").map_err(|_| "Error, failed to access user home")?);
-
             fs::create_dir_all(&dir).map_err(|_| "Error: failed to create directory")?;
 
             Command::new("/home/ideale/.nixvim/result/bin/nvim")
-                .arg(task.details_file.to_str()
-                .ok_or("Error, failed to convert related file")?)
+                .arg(task.details_file.to_str().ok_or("Error, failed to convert related file")?)
                 .status()
                 .map_err(|_| "Error, failed to load editor")?;
             Ok(())
         },
 
         Some("subtask") => {
+            let calendar: Calendar = Calendar::load()?;
+            calendar.print_tasks();
+            let parent_task = get_task(&calendar, "Enter parent task index: ")?.ok_or("You have no upcoming tasks!")?;
+            parent_task.print_subtasks()?;
+            let subtask = get_subtask(&parent_task, "Enter subtask index: ")?.ok_or("Task has no subtasks yet!")?;
+
+            let dir = format!("{}/.local/share/iptm/details_files/", std::env::var("HOME").map_err(|_| "Error, failed to access user home")?);
+            fs::create_dir_all(&dir).map_err(|_| "Error: failed to create directory")?;
+
+            Command::new("/home/ideale/.nixvim/result/bin/nvim")
+                .arg(subtask.details_file.to_str().ok_or("Error, failed to convert related file")?)
+                .status()
+                .map_err(|_| "Error, failed to load editor")?;
+
             Ok(())
         },
 

@@ -42,6 +42,19 @@ pub fn get_task<'a>(calendar: &'a Calendar, message: &'a str) -> Result<Option<&
 
 }
 
+pub fn get_subtask<'a>(parent_task: &'a Task, message: &'a str) -> Result<Option<&'a Subtask>, String> {
+    if parent_task.subtasks.is_empty() {
+        return Ok(None);
+    }
+    let task_index: usize = get_number(message)?;
+    if let Some(subtask) = parent_task.subtasks.get(task_index) {
+        return Ok(Some(subtask));
+    } else {
+        return  Err("Error, non valid index".to_string());
+    }
+
+}
+
 pub fn get_date(message: &str) -> Result<NaiveDate, String>{
     let date_input: String = get_input(message)?;
     return NaiveDate::from_str(date_input.as_str());
