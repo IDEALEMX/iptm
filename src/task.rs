@@ -42,10 +42,17 @@ impl Task {
     pub fn print_subtasks(&self) -> Result<(), String> {
         let subtask_vec = &self.subtasks;
         for (i, subtask) in subtask_vec.iter().enumerate() {
-            println!("{}) subtask: {} [ : {}]", i, subtask.name, subtask.days_required.0);
+            println!("{}) {}{}: [ : {}]", i, subtask.name, subtask_is_finished_display(subtask), subtask.days_required.0);
         }
         Ok(())
     }
 
 }
 
+fn subtask_is_finished_display(subtask: &Subtask) -> &str {
+    if subtask.finished {
+        " "
+    } else {
+        " "
+    }
+}

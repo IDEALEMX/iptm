@@ -44,7 +44,7 @@ impl Calendar {
             return;
         }
         for (i, task) in calendar_vec.iter().enumerate() {
-            println!("{}) {} [󰃰 : {}]", i, task.name, task.due_date);
+            println!("{}) {}{}: [󰃰 : {}]", i, task_is_finished_display(task), task.name, task.due_date);
         };
     }
 
