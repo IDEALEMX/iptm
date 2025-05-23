@@ -13,6 +13,7 @@ pub struct Task {
     pub details_file: Box<Path>,
     pub related_files: Vec<Box<Path>>,
     pub subtasks: Vec<Subtask>,
+    pub finished: bool,
 }
 
 impl Task {
@@ -28,6 +29,7 @@ impl Task {
             details_file,
             related_files: Vec::new(),
             subtasks: Vec::new(),
+            finished: false,
         };
 
         Ok(new_task)
@@ -40,10 +42,17 @@ impl Task {
     pub fn print_subtasks(&self) -> Result<(), String> {
         let subtask_vec = &self.subtasks;
         for (i, subtask) in subtask_vec.iter().enumerate() {
-            println!("{}) subtask: {} [ : {}]", i, subtask.name, subtask.days_required.0);
+            println!("{}) {}{}: [ : {}]", i, subtask_is_finished_display(subtask), subtask.name, subtask.days_required.0);
         }
         Ok(())
     }
 
 }
 
+fn subtask_is_finished_display(subtask: &Subtask) -> &str {
+    if subtask.finished {
+        " "
+    } else {
+        " "
+    }
+}

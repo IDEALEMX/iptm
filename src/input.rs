@@ -39,7 +39,19 @@ pub fn get_task<'a>(calendar: &'a Calendar, message: &'a str) -> Result<Option<&
     } else {
         return  Err("Error, non valid index".to_string());
     }
+}
 
+pub fn get_task_mut<'a>(calendar: &'a mut Calendar, message: &'a str) -> Result<Option<&'a mut Task>, String> {
+    let Calendar(vec) = calendar;
+    if vec.is_empty() {
+        return Ok(None);
+    }
+    let task_index: usize = get_number(message)?;
+    if let Some(task) = vec.get_mut(task_index) {
+        return Ok(Some(task));
+    } else {
+        return  Err("Error, non valid index".to_string());
+    }
 }
 
 pub fn get_subtask<'a>(parent_task: &'a Task, message: &'a str) -> Result<Option<&'a Subtask>, String> {
@@ -52,8 +64,20 @@ pub fn get_subtask<'a>(parent_task: &'a Task, message: &'a str) -> Result<Option
     } else {
         return  Err("Error, non valid index".to_string());
     }
-
 }
+
+pub fn get_subtask_mut<'a>(parent_task: &'a mut Task, message: &'a str) -> Result<Option<&'a mut Subtask>, String> {
+    if parent_task.subtasks.is_empty() {
+        return Ok(None);
+    }
+    let task_index: usize = get_number(message)?;
+    if let Some(subtask) = parent_task.subtasks.get_mut(task_index) {
+        return Ok(Some(subtask));
+    } else {
+        return  Err("Error, non valid index".to_string());
+    }
+}
+
 
 pub fn get_date(message: &str) -> Result<NaiveDate, String>{
     let date_input: String = get_input(message)?;
