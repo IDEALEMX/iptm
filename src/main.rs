@@ -6,8 +6,9 @@ pub mod calendar;
 pub mod input;
 
 use calendar::Calendar;
-use input::get_task_mut;
+use input::{get_subtask_mut, get_task_mut};
 use input::{create_task, create_subtask, get_number, get_task, get_subtask};
+use subtask::Subtask;
 use task::Task;
 use std::process::Command;
 use std::fs;
@@ -146,7 +147,19 @@ fn handle_finish(args: Vec<String>) -> Result<(), String> {
             let mut calendar: Calendar = Calendar::load()?;
             calendar.print_tasks();
             let task: &mut Task = get_task_mut(&mut calendar, "Enter task index: ")?.ok_or("You have no upcoming tasks!")?;
-            task.finished = true;
+            task.finished = !task.finished;
+            calendar.save()?;
+            Ok(())
+        }
+
+        Some("subtask") => {
+            let mut calendar: Calendar = Calendar::load()?;
+            calendar.save()?;
+            calendar.print_tasks();
+            let parent_task: &mut Task = get_task_mut(&mut calendar, "Enter parent task index: ")?.ok_or("You have no upcoming tasks!")?;
+            parent_task.print_subtasks()?;
+            let subtask: &mut Subtask = get_subtask_mut(parent_task, "Enter subtask index: ")?.ok_or("Task has no subtasks yet!")?;
+            subtask.finished = !subtask.finished;
             calendar.save()?;
             Ok(())
         }
