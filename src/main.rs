@@ -6,7 +6,7 @@ pub mod calendar;
 pub mod input;
 
 use calendar::Calendar;
-use input::{get_task, get_subtask, get_number};
+use input::{create_task, create_subtask, get_number, get_task};
 use task::Task;
 use std::process::Command;
 use std::fs;
@@ -18,17 +18,30 @@ fn main() {
 
     match args.get(1).map(String::as_str) {
         Some("new") => {
-            handle_new(args);
+            match handle_new(args) {
+                Err(e) => eprintln!("{e}"),
+                _ => (),
+            }
         },
 
         Some("read") => {
-            handle_read(args);
+            match handle_read(args) {
+                Err(e) => eprintln!("{e}"),
+                _ => (),
+            }
         }
 
         Some("list") => {
-            let calendar: Calendar = Calendar::load().unwrap();
+            let calendar: Calendar;
+            match Calendar::load() {
+                Ok(value) => calendar = value,
+                Err(e) => {eprint!("{e}"); return;},
+            }
             calendar.print();
-            calendar.save().unwrap();
+            match calendar.save() {
+                Ok(_) => (),
+                Err(e) => eprintln!("{e}"),
+            }
         }
 
         None => eprintln!("Error, missing arguments"),
@@ -37,66 +50,73 @@ fn main() {
     }
 }
 
-fn handle_new(args: Vec<String>) {
+fn handle_new(args: Vec<String>) -> Result<(), String>{
     match args.get(2).map(String::as_str) {
         Some("task") => {
-            let mut calendar: Calendar = Calendar::load().unwrap();
-            let new_task: Task = get_task().unwrap();
+            let mut calendar: Calendar = Calendar::load()?;
+            let new_task: Task = create_task()?;
             calendar.push(new_task);
-            calendar.save().unwrap();
+            calendar.save()
         },
 
         Some("subtask") => {
-            let mut calendar: Calendar = Calendar::load().unwrap();
+            let mut calendar: Calendar = Calendar::load()?;
+
             calendar.print_tasks();
             let Calendar(vec) = &mut calendar;
             if vec.is_empty() {
-                return;
+                return Ok(());
             }
-            let task_index: usize = get_number("Enter parent task index: ").unwrap();
-            let parent_task: &mut Task = vec.get_mut(task_index).expect("Error, invalid task index");
-            let subtask = get_subtask().unwrap();
+
+            let task_index: usize = get_number("Enter parent task index: ")?;
+
+            let parent_task: &mut Task;
+            match vec.get_mut(task_index) {
+                Some(value) => parent_task = value,
+                None => {return Err("Error, invalid Task index".to_string());},
+            }
+
+            let subtask = create_subtask()?;
             parent_task.push(subtask);
-            calendar.save().unwrap();
+            calendar.save()
         }
 
-        None => eprintln!("Error, missing arguments after new"),
+        None => Err("Error, missing arguments after new".to_string()),
 
-        _ => eprintln!("Error, unrecognized arguments after new"),
+        _ => Err("Error, unrecognized arguments after new".to_string()),
     }
 }
 
-fn handle_read(args: Vec<String>) {
+fn handle_read(args: Vec<String>) -> Result<(), String>{
     match args.get(2).map(String::as_str) {
         Some("related") => {
+            return Ok(());
         },
 
         Some("task") => {
-            let calendar: Calendar = Calendar::load().unwrap();
+            let calendar: Calendar = Calendar::load()?;
             calendar.print_tasks();
-            let Calendar(vec) = calendar;
-            if vec.is_empty() {
-                return;
-            }
-            let task_index: usize = get_number("Enter parent task index: ").unwrap();
-            let task: &Task = vec.get(task_index).expect("Error, invalid task index");
+            let task: &Task = get_task(&calendar, "Enter task index: ")?.ok_or("You have no upcoming tasks!")?;
 
-            let dir = format!("{}/.local/share/iptm/details_files/", std::env::var("HOME").expect("Error, failed to access user home"));
+            let dir = format!("{}/.local/share/iptm/details_files/", std::env::var("HOME").map_err(|_| "Error, failed to access user home")?);
 
-            fs::create_dir_all(&dir).expect("Error: failed to create directory");
+            fs::create_dir_all(&dir).map_err(|_| "Error: failed to create directory")?;
 
             Command::new("/home/ideale/.nixvim/result/bin/nvim")
-                .arg(task.details_file.to_str().expect("Error, failed to convert related file"))
+                .arg(task.details_file.to_str()
+                .ok_or("Error, failed to convert related file")?)
                 .status()
-                .expect("Error, failed to load editor");
+                .map_err(|_| "Error, failed to load editor")?;
+            Ok(())
         },
 
         Some("subtask") => {
+            Ok(())
         },
 
-        None => eprintln!("Error, missing arguments after new"),
+        None => Err("Error, missing arguments after new".to_string()),
 
-        _ => eprintln!("Error, unrecognized arguments after new"),
+        _ => Err("Error, unrecognized arguments after new".to_string()),
     }
 }
 
